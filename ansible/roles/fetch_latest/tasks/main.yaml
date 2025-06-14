@@ -1,0 +1,16 @@
+- name: Get latest version of cephadm
+  run_once: true
+  ansible.builtin.shell:
+    cmd: curl https://docs.ceph.com/en/latest/releases/#active-releases | grep -Po "latest \d+\.\d+\.\d+" | awk 'NR==1 { print $2 }'
+  register: cephadm_release
+  changed_when: false
+
+- name: Notify the cephadm version to be installed
+  ansible.builtin.debug:
+    msg: |-
+      Latest stable version to be installed of cephadm is {{ cephadm_release.stdout }}
+  run_once: true
+
+- name: Set captured version information as global variables for all nodes
+  ansible.builtin.set_fact:
+    cephadm_latest_version: "{{ cephadm_release.stdout }}"

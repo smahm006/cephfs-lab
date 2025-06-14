@@ -1,0 +1,37 @@
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: vagrant
+    ansible_ssh_private_key_file: /home/smahm/workstation/architecture/virtualmachines/vagrant/insecure_private_key
+    ansible_ssh_port: 22
+  children:
+    admin:
+      hosts:
+        adm01:
+          ansible_host: 10.35.56.10
+          ceph_host: 10.35.57.10
+          memory: 2048
+          cpus: 2
+    servers:
+      hosts:
+        srv01:
+          ansible_host: 10.35.56.20
+          ceph_host: 10.35.57.20
+          memory: 1024
+          cpus: 1
+        srv02:
+          ansible_host: 10.35.56.21
+          ceph_host: 10.35.57.21
+          memory: 1024
+          cpus: 1
+        srv03:
+          ansible_host: 10.35.56.22
+          ceph_host: 10.35.57.22
+          memory: 1024
+          cpus: 1
+    client:
+      hosts:
+        clt01:
+          ansible_host: 10.35.56.100
+          memory: 1024
+          cpus: 1

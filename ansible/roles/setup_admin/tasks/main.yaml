@@ -1,0 +1,8 @@
+- name: Include tasks to install cephadm
+  include_tasks: install_cephadm.yaml
+
+- name: Include tasks to bootstrap ceph cluster
+  include_tasks: bootstrap_ceph_cluster.yaml
+
+- name: Include tasks to add server hosts
+  include_tasks: add_server_hosts.yaml

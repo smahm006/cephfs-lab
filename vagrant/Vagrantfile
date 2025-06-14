@@ -1,0 +1,41 @@
+require 'yaml'
+
+vagrantfile_api_version = '2'
+root_dir = File.expand_path("../..", __FILE__)
+config_file = YAML.load_file(File.join(root_dir, "ansible/hosts.yaml"))
+cephfs_cluster = config_file['all']['children']
+
+Vagrant.configure(vagrantfile_api_version) do |config|
+  config.vm.box = 'generic/ubuntu2204'
+  config.vm.box_check_update = true
+  config.ssh.insert_key = false
+
+  cephfs_cluster.each do |group_name, group_data|
+    # Skip commented groups
+    next unless group_data.key?('hosts')
+
+    group_data['hosts'].each do |host_name, host_data|
+      vm_name = host_name
+      config.vm.define vm_name do |host_config|
+        host_config.vm.hostname = host_name
+        host_config.vm.network 'private_network', ip: host_data['ansible_host']
+        if host_data.key?('ceph_host')
+          host_config.vm.network 'private_network', ip: host_data['ceph_host']
+        end
+        host_config.vm.provider 'libvirt' do |libvirt|
+          libvirt.memory = host_data['memory']
+          libvirt.cpus = host_data['cpus']
+          if group_name == 'servers'
+            libvirt.storage :file, size: '5G'
+          end
+        end
+      end
+    end
+  end
+  config.vm.provision "shell", inline: <<-SHELL
+      echo -e "vagrant\nvagrant" | passwd root
+      sed -in 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
+      sed -in 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+      systemctl restart sshd
+  SHELL
+end

@@ -1,0 +1,35 @@
+- name: Check if cephadm is already installed
+  ansible.builtin.command: cephadm version
+  register: cephadm_check
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Notify about cephadm installation status
+  ansible.builtin.debug:
+    msg: |-
+      cephadm is {{ 'already installed.' if cephadm_check.rc == 0 else 'not installed. Proceeding with installation.' }}
+
+- name: Download and install the latest Ceph
+  when: cephadm_check.rc != 0
+  become: true
+  block:
+    - name: Download cephadm
+      ansible.builtin.get_url:
+        url: "https://download.ceph.com/rpm-{{ hostvars['localhost']['cephadm_latest_version'] }}/el9/noarch/cephadm"
+        dest: /tmp/cephadm
+        mode: '0755'
+
+    - name: Add Ceph stable release repo
+      ansible.builtin.command: "/tmp/cephadm add-repo --version {{ hostvars['localhost']['cephadm_latest_version']  }}"
+
+    - name: Update repositories cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install Ceph
+      ansible.builtin.command: "/tmp/cephadm install"
+
+- name: Install ceph-common
+  become: true
+  ansible.builtin.command: cephadm install ceph-common

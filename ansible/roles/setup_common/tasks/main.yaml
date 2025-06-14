@@ -1,0 +1,17 @@
+- name: Update the system repository (Debian based systems)
+  become: true
+  apt:
+    update_cache: true
+
+- name: Add podman to all nodes
+  become: true
+  apt:
+    name:
+      - python3
+      - podman
+      - catatonit
+      - chrony
+      - lvm2
+      - systemd
+    install_recommends: no
+    state: present

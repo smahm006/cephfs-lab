@@ -1,0 +1,20 @@
+- name: Check if ceph bootstrap has been performed
+  stat:
+    path: /etc/ceph/ceph.conf
+  register: check_ceph_conf_file
+  changed_when: false
+
+- name: Notify if ceph bootstrap has been performed already
+  debug:
+    msg: |-
+      ceph bootstrap has been performed already.
+  when: check_ceph_conf_file.stat.exists
+
+- name: Bootstrap Ceph
+  become: true
+  ansible.builtin.shell:
+    cmd: >
+      cephadm bootstrap
+      --mon-ip {{ hostvars[inventory_hostname].ansible_host }}
+      --cluster-network {{ hostvars[inventory_hostname].ceph_host | regex_replace('\.\d+$', '.0/24') }}
+  when: not check_ceph_conf_file.stat.exists
