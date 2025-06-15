@@ -23,11 +23,16 @@ Vagrant.configure(vagrantfile_api_version) do |config|
           host_config.vm.network 'private_network', ip: host_data['ceph_host']
         end
         host_config.vm.provider 'libvirt' do |libvirt|
+          libvirt.storage_pool_name = 'vagrant-pool'
           libvirt.memory = host_data['memory']
           libvirt.cpus = host_data['cpus']
+          libvirt.machine_type = 'q35'
           if group_name == 'servers'
-            libvirt.storage :file, size: '5G'
+            libvirt.storage :file, size: '20G'
           end
+        end
+        if host_name == "adm01"
+          host_config.vm.synced_folder File.join(root_dir, "manifest"), "/home/vagrant/manifest", type: "rsync"
         end
       end
     end

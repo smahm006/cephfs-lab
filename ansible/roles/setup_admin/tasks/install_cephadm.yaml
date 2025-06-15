@@ -1,3 +1,4 @@
+---
 - name: Check if cephadm is already installed
   ansible.builtin.command: cephadm version
   register: cephadm_check
@@ -27,7 +28,7 @@
       ansible.builtin.apt:
         update_cache: yes
 
-    - name: Install Ceph
+    - name: Install cephadm
       ansible.builtin.command: "/tmp/cephadm install"
 
 - name: Install ceph-common

@@ -1,0 +1,12 @@
+---
+- name: Get all hosts with labels defined
+  set_fact:
+    hosts_with_labels: "{{ groups['all'] | map('extract', hostvars) | selectattr('labels', 'defined') | list }}"
+
+- name: Apply labels via admin
+  become: true
+  shell: |
+    ceph orch host label add {{ item.0.inventory_hostname }} {{ item.1 }}
+  loop: "{{ hosts_with_labels | subelements('labels') }}"
+  loop_control:
+    label: "{{ item.0.inventory_hostname }}:{{ item.1 }}"

@@ -1,15 +1,17 @@
+---
 - name: Install the cluster’s public SSH key in the server host(s)
   ansible.builtin.expect:
-    command: ssh-copy-id -f -o StrictHostKeyChecking=no -i /etc/ceph/ceph.pub root@{{ hostvars[item].ansible_host }}
+    command: ssh-copy-id -f -o StrictHostKeyChecking=no -i /etc/ceph/ceph.pub root@{{ hostvars[item].ceph_host }}
     responses:
       (?i)password: "vagrant"
   loop: "{{ groups['servers'] }}"
 
-- name: Add host(s) to the ceph cluster
+- name: Add server host(s) to the ceph cluster
   become: true
-  ansible.builtin.command: ceph orch host add {{ item }} {{ hostvars[item].ansible_host }}
+  ansible.builtin.command: ceph orch host add {{ item }} {{ hostvars[item].ceph_host }}
   loop: "{{ groups['servers'] }}"
 
-- name: Add osd to all hosts
+- name: Add OSD to all server host(s)
   become: true
-  ansible.builtin.command: ceph orch apply osd --all-available-devices
+  ansible.builtin.command: ceph orch daemon add osd {{ item }}:/dev/vdb
+  loop: "{{ groups['servers'] }}"

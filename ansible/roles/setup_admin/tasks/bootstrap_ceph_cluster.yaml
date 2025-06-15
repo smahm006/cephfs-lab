@@ -1,3 +1,4 @@
+---
 - name: Check if ceph bootstrap has been performed
   stat:
     path: /etc/ceph/ceph.conf

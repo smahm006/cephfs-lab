@@ -1,0 +1,10 @@
+---
+- name: Install the cluster’s public SSH key in the mmm host
+  ansible.builtin.expect:
+    command: ssh-copy-id -f -o StrictHostKeyChecking=no -i /etc/ceph/ceph.pub root@{{ hostvars["mmm01"].ansible_host }}
+    responses:
+      (?i)password: "vagrant"
+
+- name: Add server host(s) to the ceph cluster
+  become: true
+  ansible.builtin.command: ceph orch host add mmm01 {{ hostvars["mmm01"].ansible_host }}

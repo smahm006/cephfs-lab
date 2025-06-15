@@ -4,5 +4,11 @@
 - name: Include tasks to bootstrap ceph cluster
   include_tasks: bootstrap_ceph_cluster.yaml
 
+- name: Include tasks to add mmm host
+  include_tasks: add_mmm_host.yaml
+
 - name: Include tasks to add server hosts
   include_tasks: add_server_hosts.yaml
+
+- name: Include tasks to add host labels
+  include_tasks: add_host_labels.yaml

@@ -1,11 +1,11 @@
 - name: Update the system repository (Debian based systems)
   become: true
-  apt:
+  ansible.builtin.apt:
     update_cache: true
 
 - name: Add podman to all nodes
   become: true
-  apt:
+  ansible.builtin.apt:
     name:
       - python3
       - podman
@@ -15,3 +15,10 @@
       - systemd
     install_recommends: no
     state: present
+
+- name: Ensure chronyd is running
+  become: true
+  ansible.builtin.systemd:
+    name: chronyd
+    state: started
+    enabled: true

@@ -1,0 +1,13 @@
+#!/usr/bin/env -S ansible-playbook -i hosts.yaml
+---
+# - hosts: localhost
+#   roles:
+#   - fetch_latest
+#
+# - hosts: all
+#   roles:
+#     - setup_common
+
+- hosts: admin
+  roles:
+    - setup_admin
